@@ -13,5 +13,11 @@ X11Forwarding yes
 PrintMotd no
 AcceptEnv LANG LC_*
 
-# SFTP setup (without chroot for RHEL 7)
+# SFTP setup with chroot (users chrooted to /sftp_root, can see only ftphome2)
 Subsystem sftp internal-sftp
+
+Match Group sftp_users
+  ChrootDirectory /sftp_root
+  ForceCommand internal-sftp
+  AllowTcpForwarding no
+  X11Forwarding no

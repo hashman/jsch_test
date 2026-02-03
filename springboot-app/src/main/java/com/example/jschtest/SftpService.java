@@ -19,16 +19,6 @@ public class SftpService {
         logger.info("Host: {}, Port: {}, User: {}", host, port, user);
         logger.info("========================================================");
 
-        // Enable JSch debug logging
-        JSch.setLogger(new com.jcraft.jsch.Logger() {
-            public boolean isEnabled(int level) {
-                return true;
-            }
-            public void log(int level, String message) {
-                logger.info("[JSch] {}", message);
-            }
-        });
-
         JSch jsch = new JSch();
         Session session = null;
         ChannelSftp channelSftp = null;
@@ -53,7 +43,8 @@ public class SftpService {
             logger.info("SFTP Channel connected for {}.", serverName);
 
             // Define remote path and list/download files without changing directory
-            String remotePath = "/home/sftpuser/upload/";
+            // /ftphome2/upload is bound to /mnt/data/ftphome2/upload via bind mount
+            String remotePath = "/ftphome2/upload";
 
             @SuppressWarnings("unchecked")
             Vector<ChannelSftp.LsEntry> fileList = channelSftp.ls(remotePath);
