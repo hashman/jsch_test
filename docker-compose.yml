@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  sftp-rhel7:
+    build:
+      context: ./sftp-rhel7
+    container_name: sftp-rhel7
+    networks:
+      - jsch_test_net
+
+  sftp-rhel8:
+    build:
+      context: ./sftp-rhel8
+    container_name: sftp-rhel8
+    networks:
+      - jsch_test_net
+
+  java-app:
+    build:
+      context: ./springboot-app
+    container_name: java-app
+    depends_on:
+      - sftp-rhel7
+      - sftp-rhel8
+    networks:
+      - jsch_test_net
+    environment:
+      - SFTP_RHEL7_HOST=sftp-rhel7
+      - SFTP_RHEL8_HOST=sftp-rhel8
+
+networks:
+  jsch_test_net:
+    driver: bridge

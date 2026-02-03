@@ -1,0 +1,19 @@
+# Standard SSHD config
+HostKey /etc/ssh/ssh_host_rsa_key
+# HostKey /etc/ssh/ssh_host_dsa_key (DSA is deprecated in RHEL8)
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+SyslogFacility AUTHPRIV
+PermitRootLogin no
+PasswordAuthentication yes
+ChallengeResponseAuthentication no
+UsePAM no
+PermitEmptyPasswords no
+X11Forwarding yes
+PrintMotd no
+AcceptEnv LANG LC_*
+LogLevel DEBUG3
+
+# SFTP setup (without chroot, same as RHEL 7)
+Subsystem sftp internal-sftp
