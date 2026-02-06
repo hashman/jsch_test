@@ -19,7 +19,7 @@ RUN echo '[base]' > /etc/yum.repos.d/CentOS-Base.repo && \
     echo 'gpgcheck=1' >> /etc/yum.repos.d/CentOS-Base.repo && \
     echo 'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7' >> /etc/yum.repos.d/CentOS-Base.repo && \
     yum clean all && \
-    yum update -y --nogpgcheck && yum install -y openssh-server sudo --nogpgcheck && yum clean all
+    yum update -y --nogpgcheck && yum install -y openssh-server sudo glibc-common langpacks-zh --nogpgcheck && yum clean all
 
 # Create a dedicated group and user for SFTP
 RUN groupadd sftp_users
@@ -38,9 +38,9 @@ RUN mkdir -p /sftp_root/ftphome2/upload \
     && chown sftpuser:sftp_users /sftp_root/ftphome2/upload \
     && chmod 755 /sftp_root/ftphome2/upload
 
-# Create test files
-RUN echo "This is a test file from RHEL7 server." > /sftp_root/ftphome2/upload/testfile_rhel7.txt \
-    && echo "Another file for testing downloads." > /sftp_root/ftphome2/upload/anothertest_rhel7.txt \
+# Create test files with BIG5 encoding
+RUN echo "This is a test file from RHEL7 server." | iconv -f UTF-8 -t BIG5 > /sftp_root/ftphome2/upload/testfile_rhel7.txt \
+    && echo "Another file for testing downloads." | iconv -f UTF-8 -t BIG5 > /sftp_root/ftphome2/upload/anothertest_rhel7.txt \
     && chown sftpuser:sftp_users /sftp_root/ftphome2/upload/*.txt
 
 # Configure SSH for SFTP

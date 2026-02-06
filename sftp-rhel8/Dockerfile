@@ -1,7 +1,7 @@
-FROM rockylinux:8
+FROM registry.access.redhat.com/ubi8/ubi:8.10
 
 # Install OpenSSH server
-RUN dnf update -y && dnf install -y openssh-server sudo && dnf clean all
+RUN dnf update -y && dnf install -y openssh-server sudo python3 && dnf clean all
 
 # Create a dedicated group and user for SFTP
 RUN groupadd sftp_users
@@ -17,9 +17,10 @@ RUN mkdir -p /ftphome2/upload \
     && chown sftpuser:sftp_users /ftphome2/upload \
     && chmod 755 /ftphome2/upload
 
-# Create test files
-RUN echo "This is a test file from RHEL8 server." > /ftphome2/upload/testfile_rhel8.txt \
-    && echo "Another file for testing downloads." > /ftphome2/upload/anothertest_rhel8.txt \
+# Create test files with BIG5 encoding
+# Create test files with BIG5 encoding using Python
+RUN python3 -c "open('/ftphome2/upload/testfile_rhel8.txt','wb').write('This is a test file from RHEL8 server.\n'.encode('big5'))" \
+    && python3 -c "open('/ftphome2/upload/anothertest_rhel8.txt','wb').write('Another file for testing downloads.\n'.encode('big5'))" \
     && chown sftpuser:sftp_users /ftphome2/upload/*.txt
 
 # Configure SSH for SFTP
