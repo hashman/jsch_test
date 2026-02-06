@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Properties;
+import java.io.FileOutputStream;
 import java.util.Vector;
 
 @Service
@@ -59,12 +59,15 @@ public class SftpService {
 
                 String remoteFilePath = remotePath + "/" + entry.getFilename();
                 String localFilePath = localDir + "/" + entry.getFilename();
-                try {
-                    logger.info("  -> Downloading {}", remoteFilePath);
-                    channelSftp.get(remoteFilePath, localFilePath);
+
+                try (FileOutputStream fileOutputStream = new FileOutputStream(localFilePath)) {
+                    logger.info("  -> Downloading {} to {}...", remoteFilePath, localFilePath);
+                    channelSftp.get(remoteFilePath, fileOutputStream);
                     logger.info("  -> Download of {} to {} successful.", remoteFilePath, localFilePath);
-                } catch (SftpException getEx) {
-                    logger.error("  -> Failed to download {}: {}", remoteFilePath, getEx.getMessage(), getEx);
+                    channelSftp.rm(remoteFilePath);
+                    logger.info("  -> Deleted remote file {} after download.", remoteFilePath);
+                } catch (Exception ex) {
+                    logger.error("  -> Failed to download {}: {}", remoteFilePath, ex.getMessage(), ex);
                 }
             }
             // --- END: Download files ---
