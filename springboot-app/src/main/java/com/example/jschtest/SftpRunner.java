@@ -29,7 +29,6 @@ public class SftpRunner implements CommandLineRunner {
     @Value("${sftp.rhel8.password}")
     private String rhel8Password;
 
-
     public SftpRunner(SftpService sftpService) {
         this.sftpService = sftpService;
     }

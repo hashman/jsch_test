@@ -5,8 +5,6 @@ services:
     build:
       context: ./sftp-rhel7
     container_name: sftp-rhel7
-    cap_add:
-      - SYS_ADMIN
     networks:
       - jsch_test_net
 
@@ -14,8 +12,6 @@ services:
     build:
       context: ./sftp-rhel8
     container_name: sftp-rhel8
-    cap_add:
-      - SYS_ADMIN
     networks:
       - jsch_test_net
 

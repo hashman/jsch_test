@@ -19,27 +19,11 @@ public class SftpService {
         logger.info("Host: {}, Port: {}, User: {}", host, port, user);
         logger.info("========================================================");
 
-        JSch jsch = new JSch();
-        Session session = null;
         ChannelSftp channelSftp = null;
-
+        Session session = null;
         try {
-            session = jsch.getSession(user, host, port);
-            session.setPassword(password);
-
-            // Important: disable host key checking for this test environment.
-            // In a production environment, you should use known_hosts.
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-
-            logger.info("Connecting to session for {}...", serverName);
-            session.connect();
-            logger.info("Session connected for {}.", serverName);
-
-            logger.info("Opening SFTP channel for {}...", serverName);
-            channelSftp = (ChannelSftp) session.openChannel("sftp");
-            channelSftp.connect();
+            channelSftp = new SftpClientUtil().initConnect(host, user, password);
+            session = channelSftp.getSession();
             logger.info("SFTP Channel connected for {}.", serverName);
 
             // Define remote path and list/download files without changing directory
