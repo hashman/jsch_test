@@ -23,25 +23,22 @@ RUN echo '[base]' > /etc/yum.repos.d/CentOS-Base.repo && \
 
 # Create a dedicated group and user for SFTP
 RUN groupadd sftp_users
-RUN useradd -M -g sftp_users -s /sbin/nologin sftpuser
+RUN useradd -M -g sftp_users -s /bin/bash sftpuser
 
 # Set password for the SFTP user (replace with a secure password in production)
 RUN echo 'sftpuser:password' | chpasswd
 
-# Create directory structure under chroot base
-# ChrootDirectory /sftp_root -> user sees /ftphome2/upload
-RUN mkdir -p /sftp_root/ftphome2/upload \
-    && chown root:root /sftp_root \
-    && chmod 755 /sftp_root \
-    && chown root:root /sftp_root/ftphome2 \
-    && chmod 755 /sftp_root/ftphome2 \
-    && chown sftpuser:sftp_users /sftp_root/ftphome2/upload \
-    && chmod 755 /sftp_root/ftphome2/upload
+# Create directory structure (no chroot, user sees full filesystem)
+RUN mkdir -p /ftphome2/upload \
+    && chown root:root /ftphome2 \
+    && chmod 755 /ftphome2 \
+    && chown sftpuser:sftp_users /ftphome2/upload \
+    && chmod 755 /ftphome2/upload
 
 # Create test files with BIG5 encoding
-RUN echo "This is a test file from RHEL7 server." | iconv -f UTF-8 -t BIG5 > /sftp_root/ftphome2/upload/testfile_rhel7.txt \
-    && echo "Another file for testing downloads." | iconv -f UTF-8 -t BIG5 > /sftp_root/ftphome2/upload/anothertest_rhel7.txt \
-    && chown sftpuser:sftp_users /sftp_root/ftphome2/upload/*.txt
+RUN echo "This is a test file from RHEL7 server." | iconv -f UTF-8 -t BIG5 > /ftphome2/upload/testfile_rhel7.txt \
+    && echo "Another file for testing downloads." | iconv -f UTF-8 -t BIG5 > /ftphome2/upload/anothertest_rhel7.txt \
+    && chown sftpuser:sftp_users /ftphome2/upload/*.txt
 
 # Configure SSH for SFTP
 COPY sshd_config /etc/ssh/sshd_config
