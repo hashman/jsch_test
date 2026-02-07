@@ -33,16 +33,7 @@ AcceptEnv XMODIFIERS
 
 Subsystem sftp /usr/libexec/openssh/sftp-server
 
-# SFTP setup with chroot (users chrooted to /sftp_root, can see only ftphome2)
-
-# Subsystem sftp internal-sftp
-
-# Match Group sftp_users
-
-# ChrootDirectory /sftp_root
-
-# ForceCommand internal-sftp
-
-# AllowTcpForwarding no
-
-# X11Forwarding no
+Match Group sftp_users
+    ChrootDirectory /sftp_jail
+    X11Forwarding no
+    AllowTcpForwarding no

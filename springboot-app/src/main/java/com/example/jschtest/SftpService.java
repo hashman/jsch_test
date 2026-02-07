@@ -49,28 +49,35 @@ public class SftpService {
             String localDir = "downloads/" + serverName;
             new java.io.File(localDir).mkdirs();
 
-            logger.info("Attempting to download files to local '{}' directory:", localDir);
-            for (ChannelSftp.LsEntry entry : fileList) {
-                // Skip directories, links, and parent directory references
-                if (entry.getAttrs().isDir() || entry.getAttrs().isLink() || entry.getFilename().equals(".")
-                        || entry.getFilename().equals("..")) {
-                    continue;
-                }
+            if (fileList.isEmpty()) {
+                logger.info("No files to download from {}.", serverName);
+            } else {
+                logger.info("Attempting to download files to local '{}' directory:", localDir);
+                for (ChannelSftp.LsEntry entry : fileList) {
+                    // Skip directories, links, and parent directory references
+                    if (entry.getAttrs().isDir() || entry.getAttrs().isLink() || entry.getFilename().equals(".")
+                            || entry.getFilename().equals("..")) {
+                        continue;
+                    }
 
-                String remoteFilePath = remotePath + "/" + entry.getFilename();
-                String localFilePath = localDir + "/" + entry.getFilename();
+                    logger.info("  -> Preparing to download: {} ({} bytes)", entry.getFilename(),
+                            entry.getAttrs().getSize());
 
-                try (FileOutputStream fileOutputStream = new FileOutputStream(localFilePath)) {
-                    logger.info("  -> Downloading {} to {}...", remoteFilePath, localFilePath);
-                    channelSftp.get(remoteFilePath, fileOutputStream);
-                    logger.info("  -> Download of {} to {} successful.", remoteFilePath, localFilePath);
-                    channelSftp.rm(remoteFilePath);
-                    logger.info("  -> Deleted remote file {} after download.", remoteFilePath);
-                } catch (Exception ex) {
-                    logger.error("  -> Failed to download {}: {}", remoteFilePath, ex.getMessage(), ex);
+                    String remoteFilePath = remotePath + "/" + entry.getFilename();
+                    String localFilePath = localDir + "/" + entry.getFilename();
+
+                    try (FileOutputStream fileOutputStream = new FileOutputStream(localFilePath)) {
+                        logger.info("  -> Downloading {} to {}...", remoteFilePath, localFilePath);
+                        channelSftp.get(remoteFilePath, fileOutputStream);
+                        logger.info("  -> Download of {} to {} successful.", remoteFilePath, localFilePath);
+                        channelSftp.rm(remoteFilePath);
+                        logger.info("  -> Deleted remote file {} after download.", remoteFilePath);
+                    } catch (Exception ex) {
+                        logger.error("  -> Failed to download {}: {}", remoteFilePath, ex.getMessage(), ex);
+                    }
                 }
+                // --- END: Download files ---
             }
-            // --- END: Download files ---
 
             logger.info("SFTP connection test to {} was SUCCESSFUL.", serverName);
 
